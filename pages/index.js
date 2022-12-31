@@ -1,12 +1,18 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from '../styles/Home.module.css'
-import Header from '../components/Header/Header'
+import Head from "next/head";
+import Image from "next/image";
+import { Inter } from "@next/font/google";
+import styles from "../styles/Home.module.css";
+import Header from "../components/Header/Header";
+import Banner from "../components/Banner";
+import LocationCard from "../components/LocationCard";
+import MediumCard from "../components/MediumCard";
+import LargeCard from "../components/LargeCard";
+import Footer from "../components/Footer";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+export default function Home({ exploreData, placeData }) {
+  console.log(placeData);
   return (
     <>
       <Head>
@@ -16,6 +22,56 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
+      <Banner />
+      <main className="max-w-7xl mx-auto px-8 sm:px-16">
+        <section className="pt-6">
+          <h2 className="text-4xl font-semibold pb-5">Explore NearBy</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {exploreData?.map((item, index) => {
+              return (
+                <LocationCard
+                  key={index}
+                  location={item.location}
+                  distance={item.distance}
+                  img={item.img}
+                />
+              );
+            })}
+          </div>
+        </section>
+        <section>
+          <h2 className="text-4xl font-semibold pb-5">Live Anywhere</h2>
+          <div className="flex space-x-3 overflow-scroll scrollbar-hide p-3 -ml-3">
+            {placeData?.map(({ img, title }, index) => {
+              return <MediumCard key={index} img={img} title={title} />;
+            })}
+          </div>
+        </section>
+        <LargeCard
+          img="/large_banner.webp"
+          title="The Greatest Outdoors"
+          description="Wishlists curated by Airnbab."
+          buttonText="Get Inspired"
+        />
+      </main>
+      <Footer />
     </>
-  )
+  );
+}
+
+export async function getStaticProps() {
+  const exploreData = await fetch("https://www.jsonkeeper.com/b/4G1G").then(
+    (result) => result.json()
+  );
+
+  const placeData = await fetch("https://www.jsonkeeper.com/b/VHHT").then(
+    (result) => result.json()
+  );
+
+  return {
+    props: {
+      exploreData,
+      placeData,
+    },
+  };
 }
